@@ -5,6 +5,7 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerView.OnIt
 
         final RecyclerView mGeoRecyclerView = findViewById(R.id.recyclerView);
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager( this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
 
         mGeoRecyclerView.setLayoutManager(mLayoutManager);
         mGeoRecyclerView.setHasFixedSize(true);
@@ -59,33 +60,64 @@ public class MainActivity extends AppCompatActivity implements RecyclerView.OnIt
                 View child = mGeoRecyclerView.findChildViewUnder(e1.getX(), e2.getY());
                 int mAdapterPosition = mGeoRecyclerView.getChildAdapterPosition(child);
 
-                try {
-                    if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-                        return false;
-                    // right to left swipe
-                    if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
-                            && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)
-                    //ligt in Europa?
-                    { if (mGeoObjects.get(mAdapterPosition).getmGeoBoolean()){
+
+                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+                    return false;
+                // right to left swipe
+                if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
+                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)
+                //ligt in Europa?
+                {
+                    if (mGeoObjects.get(mAdapterPosition).getmGeoBoolean()) {
                         //Laat antwoord zien
                         showToast("Correct! " + mGeoObjects.get(mAdapterPosition).getmGeoName().toUpperCase() + " ligt in Europa");
                     } else
                         showToast("Fout! " + mGeoObjects.get(mAdapterPosition).getmGeoName().toUpperCase() + " ligt NIET in Europa");
 
-                    } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
-                            && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                        //left to right flip
-                        { if (!mGeoObjects.get(mAdapterPosition).getmGeoBoolean()){
+                } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
+                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    //left to right flip
+                    {
+                        if (!mGeoObjects.get(mAdapterPosition).getmGeoBoolean()) {
                             //Laat antwoord zien
                             showToast("Correct! " + mGeoObjects.get(mAdapterPosition).getmGeoName().toUpperCase() + " ligt NIET in Europa");
                         } else
                             showToast("Fout! " + mGeoObjects.get(mAdapterPosition).getmGeoName().toUpperCase() + " ligt WEL in Europa");
-                        }
-                    }} catch (Exception e) {
+                    }
+                }
+                {
                 }
                 return false;
             }
         });
+
+         /* Add a touch helper to the RecyclerView to recognize when a user swipes to delete a list entry.
+        An ItemTouchHelper enables touch behavior (like swipe and move) on each ViewHolder,
+                and uses callbacks to signal when a user is performing these actions.
+
+                */
+
+//        android.support.v7.widget.helper.ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
+//
+//                new ItemTouchHelper.SimpleCallback(0, android.support.v7.widget.helper.ItemTouchHelper.LEFT | android.support.v7.widget.helper.ItemTouchHelper.RIGHT) {
+//                    @Override
+//                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+//                        return false;
+//                    }
+//
+//                    //Called when a user swipes left or right on a ViewHolder
+//                    @Override
+//                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+//
+//                        //Get the index corresponding to the selected position
+//                        int position = (viewHolder.getAdapterPosition());
+//                        mGeoObjects.remove(position);
+//                        mAdapter.notifyItemRemoved(position);
+//                    }
+//                };
+//        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+//        itemTouchHelper.attachToRecyclerView(mGeoRecyclerView);
+//        mGeoRecyclerView.addOnItemTouchListener(this);
     }
 
     private void showToast(String answer) {
